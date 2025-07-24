@@ -47,19 +47,19 @@ Aplikasi **POS (Point of Sale)** full-stack sederhana yang dibangun dengan **Lar
 
 ## ⚙️ Teknologi yang Digunakan
 
-### **Back-End:**
-- PHP 8+ / Laravel 11+
-- MySQL
+### Back-End:
+- **PHP 8+ / Laravel 11+**
+- **MySQL**
 
-### **Front-End:**
-- Vue.js 3 (Composition API)
-- Vite
-- Vue Router & Pinia *(terinstall, tapi tidak digunakan eksplisit)*
-- Axios
-- Chart.js & vue-chartjs
+### Front-End:
+- **Vue.js 3 (Composition API)**
+- **Vite**
+- **Vue Router & Pinia** (tidak digunakan secara eksplisit, tetapi terinstall)
+- **Axios**
+- **Chart.js & vue-chartjs**
 
-### **Development Tools:**
-- Git & GitHub
+### Development:
+- **Git & GitHub**
 
 ---
 
@@ -67,15 +67,79 @@ Aplikasi **POS (Point of Sale)** full-stack sederhana yang dibangun dengan **Lar
 
 Berikut adalah cara untuk menjalankan proyek ini di komputer lokal Anda.
 
-### **1. Prasyarat**
+### 1. Prasyarat
 - PHP 8.1+ & Composer
 - Node.js & NPM
 - Git
-- Database Server (misalnya **XAMPP** atau **Laragon**)
+- Database Server (misalnya XAMPP atau Laragon)
 
----
+### 2. Clone Repository
 
-### **2. Clone Repository**
 ```bash
 git clone https://github.com/NAMA_USER_ANDA/NAMA_REPO_ANDA.git
 cd nama-repo-anda
+```
+
+### 3. Setup Back-End (Laravel)
+
+Buka terminal baru dan jalankan perintah berikut dari folder utama.
+
+```bash
+# Masuk ke folder backend
+cd backend
+
+# Install dependensi PHP
+composer install
+
+# Salin file .env.example menjadi .env
+cp .env.example .env
+
+# Buat kunci aplikasi
+php artisan key:generate
+
+# Buka file .env dan sesuaikan konfigurasi database (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+# ...
+
+# Buat tabel dan isi data awal dengan seeder
+php artisan migrate:fresh --seed
+```
+
+### 4. Setup Front-End (Vue.js)
+
+Buka terminal lain dan jalankan perintah berikut dari folder utama.
+
+```bash
+# Masuk ke folder frontend
+cd frontend
+
+# Install dependensi JavaScript
+npm install
+```
+
+### 5. Menjalankan Aplikasi
+
+Anda perlu menjalankan dua server secara bersamaan di dua terminal terpisah.
+
+#### Terminal 1 (untuk Back-end):
+
+```bash
+cd backend
+php artisan serve
+# Server akan berjalan di http://127.0.0.1:8000
+```
+
+#### Terminal 2 (untuk Front-end):
+
+```bash
+cd frontend
+npm run dev
+# Server akan berjalan di http://localhost:5173
+```
+
+Buka [http://localhost:5173](http://localhost:5173) di browser Anda untuk menggunakan aplikasi.
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah **MIT License**.
