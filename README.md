@@ -32,13 +32,13 @@ Aplikasi **POS (Point of Sale)** full-stack sederhana yang dibangun dengan **Lar
 > Anda bisa drag & drop gambar ke GitHub untuk mendapatkan link-nya.
 
 - **Halaman Kasir:**  
-  ![Kasir](link-ke-screenshot-kasir.png)
+  ![Kasir](https://github.com/Lufasu-Adm/pos-app-laravel-vue/blob/main/image/POS%20APP.png)
 
 - **Halaman Manajemen Produk:**  
-  ![Produk](link-ke-screenshot-produk.png)
+  ![Produk](https://github.com/Lufasu-Adm/pos-app-laravel-vue/blob/main/image/manajemen%20produk.png)
 
-- **Halaman Dashboard:**  
-  ![Dashboard](link-ke-screenshot-dashboard.png)
+- **Halaman Riwayat:**  
+  ![Dashboard](https://github.com/Lufasu-Adm/pos-app-laravel-vue/blob/main/image/riwayat%20transaksi.png)
 
 ---
 
