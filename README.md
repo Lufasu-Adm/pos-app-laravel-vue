@@ -40,6 +40,9 @@ Aplikasi **POS (Point of Sale)** full-stack sederhana yang dibangun dengan **Lar
 - **Halaman Riwayat:**  
   ![Dashboard](https://github.com/Lufasu-Adm/pos-app-laravel-vue/blob/main/image/riwayat%20transaksi.png)
 
+- **Dashboard Laporan:**  
+  ![Dashboard](https://github.com/Lufasu-Adm/pos-app-laravel-vue/blob/main/image/riwayat%20transaksi.png)  
+
 ---
 
 ## ⚙️ Teknologi yang Digunakan
