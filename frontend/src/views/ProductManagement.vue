@@ -1,60 +1,145 @@
+<template>
+  <div class="management-container">
+    <div class="form-section">
+      <form @submit.prevent="isEditing ? updateProduct() : addProduct()" class="product-form">
+        <h2>{{ isEditing ? 'Edit Produk' : 'Tambah Produk Baru' }}</h2>
+        <div class="form-group">
+          <label for="name">Nama Produk:</label>
+          <input id="name" v-model="form.name" type="text" required>
+        </div>
+        <div class="form-group">
+          <label for="price">Harga:</label>
+          <input id="price" v-model.number="form.price" type="number" required>
+        </div>
+        <div class="form-group">
+          <label for="stock">Stok:</label>
+          <input id="stock" v-model.number="form.stock" type="number" required>
+        </div>
+        <div class="form-group">
+          <label for="category">Kategori:</label>
+          <select id="category" v-model="form.category_id" required>
+            <option :value="null" disabled>-- Pilih Kategori --</option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            {{ isEditing ? 'Simpan Perubahan' : 'Simpan Produk' }}
+          </button>
+          <button v-if="isEditing" type="button" @click="resetForm" class="btn btn-secondary">
+            Batal
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="table-section">
+      <h2>Daftar Produk</h2>
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Nama Produk</th>
+            <th>Harga</th>
+            <th>Stok</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="products.length === 0">
+            <td colspan="4" style="text-align: center;">Tidak ada produk.</td>
+          </tr>
+          <tr v-for="product in products" :key="product.id">
+            <td>{{ product.name }}</td>
+            <td>Rp {{ product.price.toLocaleString('id-ID') }}</td>
+            <td>{{ product.stock }}</td>
+            <td class="action-buttons">
+              <button @click="editProduct(product)" class="btn btn-warning">Edit</button>
+              <button @click="deleteProduct(product.id)" class="btn btn-danger">Hapus</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-// State untuk form tambah produk
-const newProduct = ref({
-  name: '',
-  price: 0,
-  stock: 0,
-  category_id: null,
-})
-
-// State untuk menampung daftar produk & kategori
 const products = ref([])
 const categories = ref([])
 
-// --- FUNGSI-FUNGSI ---
+// Menggunakan satu 'ref' untuk form agar lebih mudah di-reset
+const form = ref({
+  name: '',
+  price: 0,
+  stock: 0,
+  category_id: null
+})
+
+const isEditing = ref(false)
+const editProductId = ref(null)
+
+const API_URL = 'http://127.0.0.1:8000/api'
 
 const fetchProducts = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/products')
+    const response = await axios.get(`${API_URL}/products`)
     products.value = response.data
-  } catch (error) {
-    console.error('Gagal mengambil produk:', error)
-  }
+  } catch (error) { console.error('Gagal mengambil produk:', error) }
 }
 
 const fetchCategories = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/categories')
+    const response = await axios.get(`${API_URL}/categories`)
     categories.value = response.data
-  } catch (error) {
-    console.error('Gagal mengambil kategori:', error)
-  }
+  } catch (error) { console.error('Gagal mengambil kategori:', error) }
 }
 
-onMounted(() => {
-  fetchProducts()
-  fetchCategories()
-})
+const resetForm = () => {
+  form.value = { name: '', price: 0, stock: 0, category_id: null }
+  isEditing.value = false
+  editProductId.value = null
+}
 
 const addProduct = async () => {
   try {
-    await axios.post('http://127.0.0.1:8000/api/products', newProduct.value)
+    await axios.post(`${API_URL}/products`, form.value)
     alert('Produk berhasil ditambahkan!')
-    newProduct.value = { name: '', price: 0, stock: 0, category_id: null }
+    resetForm()
     fetchProducts()
   } catch (error) {
-    alert('Gagal menambah produk.')
+    alert('Gagal menambahkan produk.')
+    console.error(error)
+  }
+}
+
+const editProduct = (product) => {
+  isEditing.value = true
+  editProductId.value = product.id
+  form.value = { ...product } // Salin data produk ke form
+}
+
+const updateProduct = async () => {
+  try {
+    await axios.put(`${API_URL}/products/${editProductId.value}`, form.value)
+    alert('Produk berhasil diperbarui!')
+    resetForm()
+    fetchProducts()
+  } catch (error) {
+    alert('Gagal memperbarui produk.')
     console.error(error)
   }
 }
 
 const deleteProduct = async (id) => {
+  // Menambahkan konfirmasi sebelum menghapus
   if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/products/${id}`)
+      await axios.delete(`${API_URL}/products/${id}`)
       alert('Produk berhasil dihapus!')
       fetchProducts()
     } catch (error) {
@@ -63,127 +148,32 @@ const deleteProduct = async (id) => {
     }
   }
 }
+
+onMounted(() => {
+  fetchProducts()
+  fetchCategories()
+})
 </script>
 
-<template>
-  <div>
-    <!-- Navbar -->
-    <nav class="navbar">
-      <div class="navbar-brand">POS App</div>
-      <ul class="navbar-menu">
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="#" class="active">Manajemen Produk</a></li>
-      </ul>
-    </nav>
-
-    <div class="content-container">
-      <!-- Form tambah produk di kiri -->
-      <aside class="sidebar">
-        <h2>Tambah Produk Baru</h2>
-        <form @submit.prevent="addProduct" class="add-product-form">
-          <div class="form-group">
-            <label for="name">Nama Produk:</label>
-            <input id="name" v-model="newProduct.name" type="text" required>
-          </div>
-          <div class="form-group">
-            <label for="price">Harga:</label>
-            <input id="price" v-model="newProduct.price" type="number" required>
-          </div>
-          <div class="form-group">
-            <label for="stock">Stok:</label>
-            <input id="stock" v-model="newProduct.stock" type="number" required>
-          </div>
-          <div class="form-group">
-            <label for="category">Kategori:</label>
-            <select id="category" v-model="newProduct.category_id" required>
-              <option :value="null" disabled>Pilih Kategori</option>
-              <option v-for="category in categories" :key="category.id" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary">Simpan Produk</button>
-        </form>
-      </aside>
-
-      <!-- Tabel daftar produk di kanan -->
-      <main class="main-content">
-        <h2>Daftar Produk</h2>
-        <table class="product-table">
-          <thead>
-            <tr>
-              <th>Nama Produk</th>
-              <th>Harga</th>
-              <th>Stok</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="product in products" :key="product.id">
-              <td>{{ product.name }}</td>
-              <td>Rp {{ product.price }}</td>
-              <td>{{ product.stock }}</td>
-              <td>
-                <button @click="deleteProduct(product.id)" class="btn btn-danger">Hapus</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </main>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-.navbar {
+.management-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #2c3e50;
-  padding: 10px 20px;
-  color: #ecf0f1;
-}
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-.navbar-menu {
-  list-style: none;
-  display: flex;
-  gap: 20px;
-}
-.navbar-menu li a {
-  color: #ecf0f1;
-  text-decoration: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-.navbar-menu li a.active,
-.navbar-menu li a:hover {
-  background-color: #34495e;
-}
-
-.content-container {
-  display: flex;
-  gap: 20px;
+  gap: 30px;
   padding: 20px;
+  font-family: sans-serif;
 }
-.sidebar {
+.form-section {
   flex: 1;
-  max-width: 350px;
+  max-width: 400px;
 }
-.main-content {
+.table-section {
   flex: 2;
 }
-
-.add-product-form {
-  display: flex;
-  flex-direction: column;
+.product-form {
   padding: 20px;
-  border: 1px solid #ccc;
+  background-color: #f9f9f9;
   border-radius: 8px;
-  background-color: #000000ff;
+  border: 1px solid #ddd;
 }
 .form-group {
   margin-bottom: 15px;
@@ -191,48 +181,52 @@ const deleteProduct = async (id) => {
 .form-group label {
   display: block;
   margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
 }
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   box-sizing: border-box;
+}
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
 }
 .btn {
   padding: 10px 15px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
+  color: white;
   cursor: pointer;
+  font-weight: bold;
 }
-.btn-primary {
-  background-color: #27ae60;
-  color: white;
-}
-.btn-primary:hover {
-  background-color: #219150;
-}
-.btn-danger {
-  background-color: #c0392b;
-  color: white;
-}
-.btn-danger:hover {
-  background-color: #962d22;
-}
-
+.btn-primary { background-color: #28a745; }
+.btn-primary:hover { background-color: #218838; }
+.btn-secondary { background-color: #6c757d; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-warning { background-color: #ffc107; color: #212529; }
+.btn-warning:hover { background-color: #e0a800; }
+.btn-danger { background-color: #dc3545; }
+.btn-danger:hover { background-color: #c82333; }
 .product-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #000000ff;
 }
 .product-table th,
 .product-table td {
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 12px;
   text-align: left;
-  color: #2c3e50; /* buat teks terlihat */
 }
 .product-table th {
-  background-color: #000000ff;
-  color: #2c3e50;
+  background-color: #f2f2f2;
+}
+.action-buttons button {
+  margin-right: 5px;
 }
 </style>

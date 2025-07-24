@@ -1,12 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// ▼▼▼ Ganti import HomeView dengan PosView ▼▼▼
 import PosView from '../views/PosView.vue'
+import DashboardView from '../views/DashboardView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      // ▼▼▼ Ubah bagian ini ▼▼▼
       path: '/',
       name: 'pos',
       component: PosView
@@ -20,6 +19,16 @@ const router = createRouter({
       path: '/admin/products',
       name: 'product-management',
       component: () => import('../views/ProductManagement.vue')
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardView
+    }, // <-- KOMA YANG HILANG ADA DI SINI
+    {
+      path: '/history',
+      name: 'history',
+      component: () => import('../views/HistoryView.vue')
     }
   ]
 })
