@@ -137,9 +137,3 @@ npm run dev
 ```
 
 Buka [http://localhost:5173](http://localhost:5173) di browser Anda untuk menggunakan aplikasi.
-
----
-
-## 📄 Lisensi
-
-Proyek ini dilisensikan di bawah **MIT License**.
